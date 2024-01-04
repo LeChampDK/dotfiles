@@ -15,3 +15,9 @@ Clone the repository and symlink the desired dotfiles to your home directory. Fo
 ln -s /path/to/repo/.bashrc ~/.bashrc
 ln -s /path/to/repo/.vimrc ~/.vimrc
 
+## Customization
+Feel free to fork this repository or copy any of the configurations to suit your personal needs.
+
+## Contributing
+Suggestions and contributions are always welcome! Please feel free to submit a pull request or open an issue if you have something to add or modify.
+
