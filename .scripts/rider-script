@@ -8,12 +8,22 @@ CHECK_MARK="\xE2\x9C\x85"
 WARNING="\xE2\x9A\xA0"
 ROCKET="\xF0\x9F\x9A\x80"
 
+
 # Function to prompt user to select solution files to open
 select_sln_files() {
-    echo "Enter the number of the .sln file you want to open."
+    echo "Enter the file number you want to open."
     echo "Enter 0 to exit without opening any files."
     read -p "Your choice: " choice
 }
+
+# Store the path to rider in a variable
+rider_path=$(which rider)
+
+# Check if the rider_path variable is empty (rider not found)
+if [ -z "$rider_path" ]; then
+  echo -e "${WARNING} Error: rider not found in PATH ${WARNING}"
+  exit 1
+fi
 
 # Check if the current directory is inside a git repository and store the repository root path
 git_root=$(git -C "$(pwd)" rev-parse --show-toplevel 2>/dev/null)
@@ -47,15 +57,14 @@ if [ -n "$git_root" ]; then
       selected_index=$(( choice - 1 ))
       selected_sln="${sln_files[$selected_index]}"
       full_sln_path="$git_root/$selected_sln"
-      nohup rider sln "$full_sln_path" >/dev/null 2>&1 &
-      echo -e "${GREEN}${ROCKET} Rider started for: $full_sln_path${RESET}"
+      nohup "$rider_path" sln "$full_sln_path" >/dev/null 2>&1 &
+      echo -e "${GREEN}${ROCKET} Rider started for: $selected_sln${RESET}"
     else
       echo -e "${YELLOW}${WARNING} Invalid index $choice. Please select a valid number or 0 to exit.${RESET}"
     fi
   fi
 else
   # If not inside a Git repository, simply run "nohup rider" in the background
-  nohup rider >/dev/null 2>&1 &
+  nohup "$rider_path" >/dev/null 2>&1 &
   echo -e "${GREEN}${ROCKET} Rider started in the background.${RESET}"
 fi
-

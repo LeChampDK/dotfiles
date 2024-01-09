@@ -104,10 +104,12 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 alias repos='cd ~/projects/'
 alias whoshacking='open "/var/log/howdy/snapshots/$(ls /var/log/howdy/snapshots | tail -n 1)" &> /dev/null &'
 alias webstorm='webstorm $(pwd) >/dev/null 2>&1 &'
+alias rider='bash ~/.scripts/rider-script'
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
+
 
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
