@@ -147,3 +147,17 @@ function dotfiles {
    /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@
 }
 
+
+# gitmaster: Navigate to a local GitHub repo or clone it if absent.
+# Usage: gitmaster "repo-name"
+# It relies on 'gitmaster-script' to search, clone (if not present), and output the repo path.
+# Example: gitmaster "my-repo" # Clones or navigates to 'my-repo' in the local directory
+
+export ORG_NAME="cloudfactorydk"
+export DEFAULT_REPO_DIR="$HOME/projects"
+
+gitmaster() {
+    local repo_path=$(gitmaster-script "$1" | tail -1)
+    cd "$repo_path" || return
+}
+

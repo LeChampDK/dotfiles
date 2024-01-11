@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Create the directory if it doesn't exist
+mkdir -p "$SNAPSHOT_DIR"
+
+# Get the current date and time for the filename
+DATE=$(date +"%Y-%m-%d_%H%M%S")
+
+# Capture the snapshot
+fswebcam -d "$SNAPSHOT_CAMERA" --no-banner "$SNAPSHOT_DIR/snapshot_$DATE.jpg"

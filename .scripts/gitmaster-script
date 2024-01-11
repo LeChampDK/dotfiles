@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Configuration
+SEARCH_TERM=$(echo "$1" | awk '{print tolower($0)}')
+
+# Ensure the default repo directory exists
+mkdir -p "$DEFAULT_REPO_DIR"
+
+# Function to clone or navigate to a repository
+clone_or_navigate() {
+    local repo_name=$1
+    local repo_path="$DEFAULT_REPO_DIR/$repo_name"
+    
+    if [ ! -d "$repo_path" ]; then
+        echo "Cloning $ORG_NAME/$repo_name..."
+        if ! git clone "git@github.com:$ORG_NAME/$repo_name.git" "$repo_path"; then
+            echo "Error cloning repository. Check if the repository exists and you have access."
+            return 1
+        fi
+    fi
+
+    echo "$repo_path"  # Output the path
+}
+
+search_repos() {
+    gh search repos "$1" --owner "$ORG_NAME" --json name -q '.[].name'
+}
+
+# Call search_repos with the search term
+repos=$(search_repos "$SEARCH_TERM")
+
+if [ -z "$repos" ]; then
+    echo "No repositories found matching '$SEARCH_TERM' in '$ORG_NAME'"
+    exit 1
+fi
+
+# Let the user choose a repository
+echo "Select a repository to clone/navigate:"
+select repo_name in $repos; do
+    repo_path=$(clone_or_navigate "$repo_name")
+    break
+done
+
+echo "$repo_path"  # Output the path for the function to use
