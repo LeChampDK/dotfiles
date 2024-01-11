@@ -102,7 +102,7 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
 
 alias repos='cd ~/projects/'
-alias whoshacking='open "/var/log/howdy/snapshots/$(ls /var/log/howdy/snapshots | tail -n 1)" &> /dev/null &'
+alias whoshacking='open "/home/rene/failed-login-snapshots/$(ls /home/rene/failed-login-snapshots | tail -n 1)" &> /dev/null &'
 alias webstorm='webstorm $(pwd) >/dev/null 2>&1 &'
 alias rider='bash ~/.scripts/rider-script'
 alias ..="cd .."
@@ -147,17 +147,19 @@ function dotfiles {
    /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@
 }
 
-
-# gitmaster: Navigate to a local GitHub repo or clone it if absent.
+# gitmaster
+export ORG_NAME="cloudfactorydk"
+export DEFAULT_REPO_DIR="$HOME/projects"
+# Navigate to a local GitHub repo or clone it if absent.
 # Usage: gitmaster "repo-name"
 # It relies on 'gitmaster-script' to search, clone (if not present), and output the repo path.
 # Example: gitmaster "my-repo" # Clones or navigates to 'my-repo' in the local directory
-
-export ORG_NAME="cloudfactorydk"
-export DEFAULT_REPO_DIR="$HOME/projects"
 
 gitmaster() {
     local repo_path=$(gitmaster-script "$1" | tail -1)
     cd "$repo_path" || return
 }
 
+# Capture the hacker variables
+export SNAPSHOT_CAMERA="/dev/video0"
+export SNAPSHOT_DIR="$HOME/failed-login-snapshots"

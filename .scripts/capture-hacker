@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Set the path to the snapshot camera
+SNAPSHOT_CAMERA="/dev/video0"
+
+# Set the directory where you want to save the snapshots
+SNAPSHOT_DIR="/home/rene/failed-login-snapshots"
+
 # Create the directory if it doesn't exist
 mkdir -p "$SNAPSHOT_DIR"
 
