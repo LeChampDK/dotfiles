@@ -1,5 +1,7 @@
 #!/bin/bash
 
+exec >> /tmp/abc-capture-hacker.log 2>&1
+
 # Set the path to the snapshot camera
 SNAPSHOT_CAMERA="/dev/video0"
 
@@ -13,4 +15,43 @@ mkdir -p "$SNAPSHOT_DIR"
 DATE=$(date +"%Y-%m-%d_%H%M%S")
 
 # Capture the snapshot
-fswebcam -d "$SNAPSHOT_CAMERA" --no-banner "$SNAPSHOT_DIR/snapshot_$DATE.jpg"
+fswebcam -d "$SNAPSHOT_CAMERA" -r 1280x720 --no-banner "$SNAPSHOT_DIR/snapshot_$DATE.jpg"
+
+echo "$PUSHBULLET_API_KEY"
+
+image_directory=~/failed-login-snapshots
+token_id=$SECRET_PUSHBULLET_KEY
+body="Yoooo homie, shits about to go down"
+title="CHECK YOOO COMPUTAAH"
+file_name=$(ls -t "$image_directory" | head -n 1)
+
+file_type=$(file -i -b $file_name)
+json="{\"file_name\":\"$file_name\",\"file_type\":\"$file_type\"}"
+accesstoken=$(printf "Access-Token: %s" $token_id)
+
+curl_return=$(curl --header "$accesstoken" \
+     --header 'Content-Type: application/json' \
+     --data-binary "$json" \
+     --request POST \
+     https://api.pushbullet.com/v2/upload-request)
+
+file_name=$(echo $curl_return | grep -oP '"(file_name)":"\K.*?(?=")')
+file_url=$(echo $curl_return | grep -oP '"(file_url)":"\K.*?(?=")')
+file_type=$(echo $curl_return | grep -oP '"(file_type)":"\K.*?(?=")')
+upload_url=$(echo $curl_return | grep -oP '"(upload_url)":"\K.*?(?=")')
+
+cd ~/failed-login-snapshots
+curl -i -X POST $upload_url -F file=@$file_name
+
+type="file"
+json1="{\"type\":\"$type\",\"title\":\"$title\",\"body\":\"$body\",\"file_name\":\"$file_name\",\"file_type\":\"$file_type\",\"file_url\":\"$file_url\"}"
+
+ret_curl=$(curl --header "$accesstoken" \
+     --header 'Content-Type: application/json' \
+     --data-binary "$json1" \
+     --request POST \
+     https://api.pushbullet.com/v2/pushes)
+
+echo $ret_curl
+
+

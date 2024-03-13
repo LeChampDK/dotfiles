@@ -101,6 +101,7 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # ~/.bash_aliases, instead of adding them here directly.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
 
+alias jira-time='bash ~/projects/jira-scripts/01-time-reports.sh'
 alias repos='cd ~/projects/'
 alias whoshacking='open "/home/rene/failed-login-snapshots/$(ls /home/rene/failed-login-snapshots | tail -n 1)" &> /dev/null &'
 alias webstorm='webstorm $(pwd) >/dev/null 2>&1 &'
@@ -109,10 +110,16 @@ alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
-
+alias gb='gh browse'
+alias gp='gh pr view -w'
 
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
+fi
+
+# Secrets
+if [ -f "$HOME/.bash_secrets" ]; then
+    source "$HOME/.bash_secrets"
 fi
 
 # enable programmable completion features (you don't need to enable
@@ -155,11 +162,16 @@ export DEFAULT_REPO_DIR="$HOME/projects"
 # It relies on 'gitmaster-script' to search, clone (if not present), and output the repo path.
 # Example: gitmaster "my-repo" # Clones or navigates to 'my-repo' in the local directory
 
-gitmaster() {
-    local repo_path=$(gitmaster-script "$1" | tail -1)
+gm() {
+    local search_mode="$2"
+    local repo_path=$(gitmaster-script "$1" "$search_mode" | tail -1)
     cd "$repo_path" || return
 }
 
 # Capture the hacker variables
 export SNAPSHOT_CAMERA="/dev/video0"
 export SNAPSHOT_DIR="$HOME/failed-login-snapshots"
+
+# Secrets
+source ~/.secrets/.azure-secrets
+

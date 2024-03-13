@@ -2,6 +2,7 @@
 
 # Configuration
 SEARCH_TERM=$(echo "$1" | awk '{print tolower($0)}')
+SEARCH_MODE="$2"  # Capture the second argument as search mode
 
 # Ensure the default repo directory exists
 mkdir -p "$DEFAULT_REPO_DIR"
@@ -22,12 +23,24 @@ clone_or_navigate() {
     echo "$repo_path"  # Output the path
 }
 
+# Function to search local repositories
+search_local_repos() {
+    local search_term=$1
+    # Using -iname for case-insensitive search and printing only the directory names
+    find "$DEFAULT_REPO_DIR" -maxdepth 1 -type d -iname "*$search_term*" -exec basename {} \;
+}
+
+# Function to search GitHub repositories
 search_repos() {
     gh search repos "$1" --owner "$ORG_NAME" --json name -q '.[].name'
 }
 
-# Call search_repos with the search term
-repos=$(search_repos "$SEARCH_TERM")
+# Determine the search function based on the mode
+if [ "$SEARCH_MODE" = "-l" ]; then
+    repos=$(search_local_repos "$SEARCH_TERM")
+else
+    repos=$(search_repos "$SEARCH_TERM")
+fi
 
 if [ -z "$repos" ]; then
     echo "No repositories found matching '$SEARCH_TERM' in '$ORG_NAME'"
@@ -42,3 +55,4 @@ select repo_name in $repos; do
 done
 
 echo "$repo_path"  # Output the path for the function to use
+
