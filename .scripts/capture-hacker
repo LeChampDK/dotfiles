@@ -17,7 +17,7 @@ DATE=$(date +"%Y-%m-%d_%H%M%S")
 # Capture the snapshot
 fswebcam -d "$SNAPSHOT_CAMERA" -r 1280x720 --no-banner "$SNAPSHOT_DIR/snapshot_$DATE.jpg"
 
-echo "$PUSHBULLET_API_KEY"
+echo "$SECRET_PUSHBULLET_KEY"
 
 image_directory=~/failed-login-snapshots
 token_id=$SECRET_PUSHBULLET_KEY

@@ -38,6 +38,7 @@ fi
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
+    xterm-kitty) color_prompt=yes;;
 esac
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
@@ -57,7 +58,7 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    PS1="\[$(tput setaf 114)\]\u\[$(tput setaf 80)\]@\[$(tput setaf 46)\]\h \[$(tput setaf 39)\]\w \[$(tput sgr0)\]$ "
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
@@ -87,40 +88,6 @@ fi
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
-
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
-alias jira-time='bash ~/projects/jira-scripts/01-time-reports.sh'
-alias repos='cd ~/projects/'
-alias whoshacking='open "/home/rene/failed-login-snapshots/$(ls /home/rene/failed-login-snapshots | tail -n 1)" &> /dev/null &'
-alias webstorm='webstorm $(pwd) >/dev/null 2>&1 &'
-alias rider='bash ~/.scripts/rider-script'
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-alias .....="cd ../../../.."
-alias gb='gh browse'
-alias gp='gh pr view -w'
-
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
-
-# Secrets
-if [ -f "$HOME/.bash_secrets" ]; then
-    source "$HOME/.bash_secrets"
-fi
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -133,45 +100,23 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# Dotnet
-export DOTNET_ROOT=$HOME/.dotnet
-export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
-# Helper function to install new dotnet versions
-#
-# To install .NET 6.0:
-# dotnet-install -c 6.0
-function dotnet-install {
-        if [[ ! -f $HOME/dotnet-install.sh ]]; then
-                wget https://dot.net/v1/dotnet-install.sh -O $HOME/dotnet-install.sh
-                chmod +x $HOME/dotnet-install.sh
-        fi
-        $HOME/dotnet-install.sh $@
-}
-
 export PATH="$PATH:~/.scripts"
 
-function dotfiles {
-   /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@
-}
+if [ -f "$HOME/.bash_aliases" ]; then
+    source "$HOME/.bash_aliases"
+fi
 
-# gitmaster
-export ORG_NAME="cloudfactorydk"
-export DEFAULT_REPO_DIR="$HOME/projects"
-# Navigate to a local GitHub repo or clone it if absent.
-# Usage: gitmaster "repo-name"
-# It relies on 'gitmaster-script' to search, clone (if not present), and output the repo path.
-# Example: gitmaster "my-repo" # Clones or navigates to 'my-repo' in the local directory
+if [ -f "$HOME/.bash_secrets" ]; then
+    source "$HOME/.bash_secrets"
+fi
 
-gm() {
-    local search_mode="$2"
-    local repo_path=$(gitmaster-script "$1" "$search_mode" | tail -1)
-    cd "$repo_path" || return
-}
+if [ -f "$HOME/.bash_methods" ]; then
+    source "$HOME/.bash_methods"
+fi
 
-# Capture the hacker variables
-export SNAPSHOT_CAMERA="/dev/video0"
-export SNAPSHOT_DIR="$HOME/failed-login-snapshots"
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# Secrets
-source ~/.secrets/.azure-secrets
-
+# Load Angular CLI autocompletion.
+source <(ng completion script)
