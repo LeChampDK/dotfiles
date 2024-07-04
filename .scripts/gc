@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Check if a commit message is provided
+if [ $# -eq 0 ]; then
+    echo "Usage: gc <commit_message>"
+    exit 1
+fi
+
+# Get the commit message as the first argument
+commit_message="$1"
+
+# Fetch the latest changes from the remote repository
+git fetch
+
+# Get the current branch name
+current_branch=$(git symbolic-ref --short HEAD)
+
+# List of main branches
+main_branches=("master" "main" "release" "rc" "alpha" "development")
+
+# Check if the current branch is one of the main branches
+if [[ " ${main_branches[@]} " =~ " $current_branch " ]]; then
+    read -p "You are about to push to the main branch '$current_branch'. Are you sure you want to continue? (y/n): " confirm
+    if [ "$confirm" != "y" ]; then
+        echo "Push cancelled."
+        exit 1
+    fi
+fi
+
+# Add all changed files to the staging area
+git add .
+
+# Commit the changes with the provided commit message
+git commit -m "$commit_message"
+
+# Push the changes to the current branch
+git push origin "$current_branch"
