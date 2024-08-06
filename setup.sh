@@ -25,7 +25,7 @@ function clone() {
 function backup_existing_files() {
 	mkdir -p $dotfiles_dir_backups 
 	cd $dotfiles_dir 
-	tracked_files=$(git ls-tree -r master --name-only)
+	tracked_files=$(git ls-tree -r main --name-only)
 
 	for file in $tracked_files;
 	do
