@@ -6,6 +6,9 @@ case $- in
       *) return;;
 esac
 
+# Fix for SSH from kitty terminal
+[[ "$TERM" == "xterm-kitty" ]] && export TERM=xterm-256color
+
 # History
 HISTCONTROL=ignoreboth
 shopt -s histappend
