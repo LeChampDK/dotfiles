@@ -1,24 +1,53 @@
 # Dotfiles
 
-## Overview
-This repository hosts a collection of my personal dotfiles for Linux systems. It's designed to streamline the setup of a new environment and maintain consistency across various machines. Whether you're setting up a new machine or just looking for ideas to improve your own configurations, this repository might have what you need.
+Cross-platform dotfiles for Linux, macOS, and Windows.
 
-## What's Inside
-- **.bashrc**: Custom bash configurations to enhance the command line experience.
-- **.vimrc**: Vim settings for an optimized text editing workflow.
-- Additional dotfiles for various Linux applications and utilities.
+## Structure
 
-## Installation
-Clone the repository and symlink the desired dotfiles to your home directory. For example:
-
-```bash
-ln -s /path/to/repo/.bashrc ~/.bashrc
-ln -s /path/to/repo/.vimrc ~/.vimrc
+```
+.vimrc          ← Shared (all platforms)
+.bashrc         ← Linux
+.zshrc          ← macOS
+windows/        ← PowerShell profile
+.scripts/       ← Shared utility scripts
+install.sh      ← Auto-detect OS and symlink
 ```
 
-## Customization
-Feel free to fork this repository or copy any of the configurations to suit your personal needs.
+## Install
 
-## Contributing
-Suggestions and contributions are always welcome! Please feel free to submit a pull request or open an issue if you have something to add or modify.
+```bash
+git clone https://github.com/LeChampDK/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+chmod +x install.sh
+./install.sh
+```
 
+The installer will:
+1. Detect your OS
+2. Symlink `.vimrc` (always)
+3. Symlink the OS-specific shell config (`.bashrc` / `.zshrc` / PowerShell profile)
+4. Back up any existing files to `~/.dotfiles-backups/<timestamp>/`
+
+## Local overrides (not tracked)
+
+Each shell sources a `.local` file at the end — use these for machine-specific config:
+
+| Shell | Local override file |
+|-------|-------------------|
+| Bash | `~/.bashrc.local` |
+| Zsh | `~/.zshrc.local` |
+| PowerShell | `~/.ps_local.ps1` |
+
+Also sourced (if present): `~/.bash_secrets`, `~/.zsh_secrets`, etc.
+
+## Windows
+
+On Windows, run from Git Bash or copy the PowerShell profile manually:
+
+```powershell
+Copy-Item .\windows\Microsoft.PowerShell_profile.ps1 $PROFILE
+```
+
+## Scripts
+
+Put shared scripts in `.scripts/` — all platforms add `~/.scripts` to PATH.
