@@ -96,7 +96,7 @@ if [ -d "$DOTFILES_DIR/.scripts" ]; then
     echo "Scripts:"
     link_file "$DOTFILES_DIR/.scripts" "$HOME/.scripts"
 fi
-
+vim +PlugInstall +qall
 echo ""
 echo "Done! Existing files backed up to: $BACKUP_DIR"
 echo "Restart your shell or run: source ~/.bashrc / source ~/.zshrc"
