@@ -1,9 +1,44 @@
 #!/usr/bin/env bash
-# install.sh — Detect OS and symlink the right dotfiles
 set -e
 
 DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 BACKUP_DIR="$HOME/.dotfiles-backups/$(date +%Y%m%d-%H%M%S)"
+
+# Required dependencies
+REQUIRED=(git vim gh curl)
+MISSING=()
+
+for cmd in "${REQUIRED[@]}"; do
+    if ! command -v "$cmd" &>/dev/null; then
+        MISSING+=("$cmd")
+    fi
+done
+
+if [ ${#MISSING[@]} -gt 0 ]; then
+    echo "Missing dependencies: ${MISSING[*]}"
+    read -p "Install them now? (y/n): " confirm
+    if [ "$confirm" = "y" ]; then
+        case "$(uname -s)" in
+            Linux*)
+                sudo apt update && sudo apt install -y ${MISSING[*]}
+                ;;
+            Darwin*)
+                if ! command -v brew &>/dev/null; then
+                    echo "Homebrew not found. Install it first: https://brew.sh"
+                    exit 1
+                fi
+                brew install ${MISSING[*]}
+                ;;
+            *)
+                echo "Auto-install not supported on this OS. Install manually: ${MISSING[*]}"
+                exit 1
+                ;;
+        esac
+    else
+        echo "Cannot continue without: ${MISSING[*]}"
+        exit 1
+    fi
+fi
 
 link_file() {
     local src="$1" dst="$2"
