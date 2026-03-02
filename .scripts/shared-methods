@@ -18,6 +18,9 @@ gnb() {
     git push -u origin "$1"
 }
 
+# Git: push + create PR (uses make-pr script)
+alias gps='bash ~/.scripts/make-pr'
+
 # Git: new branch + commit + push + PR
 gpr() {
     if [ -z "$1" ] || [ -z "$2" ]; then
@@ -26,5 +29,5 @@ gpr() {
     fi
     gnb "$1"
     gc "$2"
-    echo "Branch '$1' pushed. Create PR with: gh pr create"
+    gps "$2"
 }

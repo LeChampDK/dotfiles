@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+# Check if at least one argument is provided (PR title)
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 \"Pull request title\""
+    exit 1
+fi
+
+PR_TITLE="$1"
+MAIN_BRANCHES=("development" "release" "main")
+EXISTING_BRANCHES=()
+
+# Fetch the latest branches from origin
+git fetch origin
+
+# Check which of the main branches exist in the remote
+for branch in "${MAIN_BRANCHES[@]}"; do
+    if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+        EXISTING_BRANCHES+=("$branch")
+    fi
+done
+
+# If no known main branches were found, default to 'main'
+if [ ${#EXISTING_BRANCHES[@]} -eq 0 ]; then
+    echo "No known main branches found (development, release, main). Defaulting to 'main'."
+    TARGET_BRANCH="main"
+else
+    echo "Select the target branch for your pull request:"
+    select branch in "${EXISTING_BRANCHES[@]}"; do
+        TARGET_BRANCH=$branch
+        break
+    done
+fi
+
+# Create the pull request and capture the URL
+PR_URL=$(gh pr create --base "$TARGET_BRANCH" --title "$PR_TITLE" --body "" --repo $(git remote get-url origin) 2>/dev/null)
+
+# Check if the PR creation was successful
+if [ $? -eq 0 ]; then
+    echo "Pull request created: $PR_URL"
+    gh pr view --web > /dev/null 2>&1 &
+else
+    echo "Failed to create pull request."
+    exit 1
+fi
