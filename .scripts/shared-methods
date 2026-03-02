@@ -1,0 +1,30 @@
+# shared-methods — cross-platform shell functions
+# Sourced by .bashrc and .zshrc
+
+# Git: navigate to repo (uses gitmaster-script)
+gm() {
+    local search_mode="$2"
+    local repo_path=$(gitmaster-script "$1" "$search_mode" | tail -1)
+    cd "$repo_path" || return
+}
+
+# Git: new branch + push with tracking
+gnb() {
+    if [ -z "$1" ]; then
+        echo "Usage: gnb <branch-name>"
+        return 1
+    fi
+    git checkout -b "$1"
+    git push -u origin "$1"
+}
+
+# Git: new branch + commit + push + PR
+gpr() {
+    if [ -z "$1" ] || [ -z "$2" ]; then
+        echo "Usage: gpr <branch-name> <commit-message>"
+        return 1
+    fi
+    gnb "$1"
+    gc "$2"
+    echo "Branch '$1' pushed. Create PR with: gh pr create"
+}

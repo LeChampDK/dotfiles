@@ -1,41 +1,65 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Configuration
 SEARCH_TERM=$(echo "$1" | awk '{print tolower($0)}')
-SEARCH_MODE="$2"  # Capture the second argument as search mode
+SEARCH_MODE="$2"
 
-# Ensure the default repo directory exists
-mkdir -p "$DEFAULT_REPO_DIR"
+# Personal mode: -p flag uses your GitHub username
+if [ "$SEARCH_MODE" = "-p" ] || [ "$SEARCH_MODE" = "-pl" ] || [ "$SEARCH_MODE" = "-lp" ]; then
+    OWNER=$(gh api user --jq '.login' 2>/dev/null)
+    if [ -z "$OWNER" ]; then
+        echo "Error: Could not determine GitHub username. Run 'gh auth login' first."
+        exit 1
+    fi
+    REPO_DIR="${PERSONAL_REPO_DIR:-$HOME/repos}"
+    # Check if also local mode
+    if [[ "$SEARCH_MODE" == *"l"* ]]; then
+        SEARCH_MODE="-l"
+    else
+        SEARCH_MODE=""
+    fi
+elif [ "$SEARCH_MODE" = "-l" ]; then
+    if [ -z "$ORG_NAME" ] || [ -z "$DEFAULT_REPO_DIR" ]; then
+        echo "Error: ORG_NAME and DEFAULT_REPO_DIR must be set."
+        echo "Set them in your shell config or use -p for personal repos."
+        exit 1
+    fi
+    OWNER="$ORG_NAME"
+    REPO_DIR="$DEFAULT_REPO_DIR"
+else
+    if [ -z "$ORG_NAME" ] || [ -z "$DEFAULT_REPO_DIR" ]; then
+        echo "Error: ORG_NAME and DEFAULT_REPO_DIR must be set."
+        echo "Set them in your shell config or use -p for personal repos."
+        exit 1
+    fi
+    OWNER="$ORG_NAME"
+    REPO_DIR="$DEFAULT_REPO_DIR"
+fi
 
-# Function to clone or navigate to a repository
+mkdir -p "$REPO_DIR"
+
 clone_or_navigate() {
     local repo_name=$1
-    local repo_path="$DEFAULT_REPO_DIR/$repo_name"
-    
+    local repo_path="$REPO_DIR/$repo_name"
+
     if [ ! -d "$repo_path" ]; then
-        echo "Cloning $ORG_NAME/$repo_name..."
-        if ! git clone "git@github.com:$ORG_NAME/$repo_name.git" "$repo_path"; then
-            echo "Error cloning repository. Check if the repository exists and you have access."
+        echo "Cloning $OWNER/$repo_name..."
+        if ! gh repo clone "$OWNER/$repo_name" "$repo_path"; then
+            echo "Error cloning repository."
             return 1
         fi
     fi
 
-    echo "$repo_path"  # Output the path
+    echo "$repo_path"
 }
 
-# Function to search local repositories
 search_local_repos() {
-    local search_term=$1
-    # Using -iname for case-insensitive search and printing only the directory names
-    find "$DEFAULT_REPO_DIR" -maxdepth 1 -type d -iname "*$search_term*" -exec basename {} \;
+    find "$REPO_DIR" -maxdepth 1 -type d -iname "*$1*" -exec basename {} \;
 }
 
-# Function to search GitHub repositories
 search_repos() {
-    gh search repos "$1" --owner "$ORG_NAME" --json name -q '.[].name'
+    gh search repos "$1" --owner "$OWNER" --json name -q '.[].name'
 }
 
-# Determine the search function based on the mode
 if [ "$SEARCH_MODE" = "-l" ]; then
     repos=$(search_local_repos "$SEARCH_TERM")
 else
@@ -43,16 +67,14 @@ else
 fi
 
 if [ -z "$repos" ]; then
-    echo "No repositories found matching '$SEARCH_TERM' in '$ORG_NAME'"
+    echo "No repositories found matching '$SEARCH_TERM' in '$OWNER'"
     exit 1
 fi
 
-# Let the user choose a repository
 echo "Select a repository to clone/navigate:"
 select repo_name in $repos; do
     repo_path=$(clone_or_navigate "$repo_name")
     break
 done
 
-echo "$repo_path"  # Output the path for the function to use
-
+echo "$repo_path"
