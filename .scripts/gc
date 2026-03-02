@@ -33,5 +33,9 @@ git add .
 # Commit the changes with the provided commit message
 git commit -m "$commit_message"
 
-# Push the changes to the current branch
-git push origin "$current_branch"
+# Check if branch has an upstream; if not, set it with -u on the first push
+if ! git rev-parse --abbrev-ref --symbolic-full-name @{u} >/dev/null 2>&1; then
+    git push -u origin "$current_branch"
+else
+    git push origin "$current_branch"
+fi
