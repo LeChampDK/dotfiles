@@ -74,7 +74,7 @@ export PATH="$PATH:$HOME/.scripts:$HOME/.local/bin"
 [ -f "$HOME/.bash_secrets" ]  && source "$HOME/.bash_secrets"
 [ -f "$HOME/.bash_methods" ]  && source "$HOME/.bash_methods"
 [ -f "$HOME/.bashrc.local" ]  && source "$HOME/.bashrc.local"
-
+[ -f "$HOME/.scripts/shared-methods" ] && source "$HOME/.scripts/shared-methods"
 # nvm (if installed)
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"

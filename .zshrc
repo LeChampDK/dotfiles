@@ -52,3 +52,4 @@ fi
 [ -f "$HOME/.zsh_secrets" ]  && source "$HOME/.zsh_secrets"
 [ -f "$HOME/.zsh_methods" ]  && source "$HOME/.zsh_methods"
 [ -f "$HOME/.zshrc.local" ]  && source "$HOME/.zshrc.local"
+[ -f "$HOME/.scripts/shared-methods" ] && source "$HOME/.scripts/shared-methods"
